@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="240" viewBox="0 0 1000 240" role="img" aria-label="Jeremy Jiménez — Desarrollador Junior">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1620"/>
+      <stop offset="1" stop-color="#16263a"/>
+    </linearGradient>
+    <style>
+      text { font-family: 'DM Mono', ui-monospace, Menlo, Consolas, monospace; }
+      .t1 { fill:#A9CCE8; font-size:15px; letter-spacing:3px; animation: in 1s .2s backwards; }
+      .t2 { fill:#ffffff; font-size:46px; font-weight:500; animation: in 1s .6s backwards; }
+      .t3 { fill:#5B9BD5; font-size:20px; animation: in 1s 1s backwards; }
+      .t4 { fill:#7f8b99; font-size:14px; animation: in 1s 1.4s backwards; }
+      .cur { fill:#5B9BD5; animation: blink 1s steps(1) infinite; }
+      @keyframes in { from { opacity:0; } to { opacity:1; } }
+      @keyframes blink { 50% { opacity:0; } }
+    </style>
+  </defs>
+  <rect width="1000" height="240" rx="16" fill="url(#bg)"/>
+  <circle cx="900" cy="40" r="90" fill="#2B5F8F" opacity=".18"/>
+  <circle cx="960" cy="200" r="60" fill="#5B9BD5" opacity=".12"/>
+  <text class="t1" x="60" y="72">✦ BIENVENIDO A MI PERFIL</text>
+  <text class="t2" x="60" y="128">Jeremy Jiménez</text>
+  <text class="t3" x="60" y="166">Desarrollador Junior · React · Next.js · Node.js</text>
+  <text class="t4" x="60" y="198">construyendo interfaces y automatizando lo repetitivo</text>
+  <rect class="cur" x="60" y="208" width="10" height="3"/>
+</svg>

@@ -3,9 +3,9 @@ import json, os, sys, random, urllib.request
 USER = os.environ.get("GITHUB_USER", "JIMENEZ45")
 CELL, GAP, PAD = 12, 4, 14
 STEP = CELL + GAP
-DT = 0.07          # segundos por casilla
+DT = 0.13          # segundos por casilla
 LEVELS = ["#5eead4", "#38bdf8", "#818cf8", "#c084fc", "#f472b6"]  # nivel 0..4 (0 = vacío)
-MAX_LEN = 50
+MAX_LEN = 30
 
 
 def fetch_weeks():
@@ -52,18 +52,48 @@ def main():
     def pos(c, r):
         return PAD + c * STEP, PAD + r * STEP
 
-    path = []
-    for c in range(W):
-        rows = range(7) if c % 2 == 0 else range(6, -1, -1)
-        for r in rows:
-            path.append((c, r))
+    # comida: casillas con contribuciones; la serpiente va a buscarlas
+    from collections import deque
+    todo = {(c, r) for c in range(W) for r in range(7) if weeks[c][r] > 0}
+    cur = (0, 3)
+    path = [cur]
+    foods = []  # (col,row,level,time)
+
+    def bfs(src, goal, blocked):
+        prev = {src: None}
+        dq = deque([src])
+        while dq:
+            u = dq.popleft()
+            if u == goal:
+                break
+            for dc, dr in ((1, 0), (0, 1), (0, -1), (-1, 0)):
+                v = (u[0] + dc, u[1] + dr)
+                if 0 <= v[0] < W and 0 <= v[1] < 7 and v not in prev and (v not in blocked or v == goal):
+                    prev[v] = u
+                    dq.append(v)
+        if goal not in prev:
+            return None
+        out = []
+        u = goal
+        while u != src:
+            out.append(u)
+            u = prev[u]
+        return out[::-1]
+
+    if cur in todo:
+        todo.discard(cur)
+        foods.append((cur[0], cur[1], level(weeks[cur[0]][cur[1]], mx), 0.0))
+    while todo:
+        tgt = min(todo, key=lambda f: (abs(f[0] - cur[0]) + abs(f[1] - cur[1]), f[0]))
+        length = min(len(foods) + 1, MAX_LEN)
+        body = set(path[-length:])
+        seg = bfs(cur, tgt, body) or bfs(cur, tgt, set())
+        path.extend(seg)
+        cur = tgt
+        todo.discard(tgt)
+        foods.append((tgt[0], tgt[1], level(weeks[tgt[0]][tgt[1]], mx), (len(path) - 1) * DT))
     n = len(path)
     T = n * DT
-
-    foods = []  # (col,row,level,time)
-    for i, (c, r) in enumerate(path):
-        if weeks[c][r] > 0:
-            foods.append((c, r, level(weeks[c][r], mx), i * DT))
     L = min(len(foods) + 1, MAX_LEN)
     D = T + 2 + L * DT + 1.5
 

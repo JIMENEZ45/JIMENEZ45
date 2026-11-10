@@ -61,7 +61,7 @@ Panel web para ejecutar automatizaciones de n8n desde el navegador, con login, r
 ![TypeScript](https://img.shields.io/badge/TypeScript-5B9BD5?style=flat-square&logo=typescript&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-A9CCE8?style=flat-square&logo=supabase&logoColor=white)
 
-[![Live](https://img.shields.io/badge/live-5B9BD5?style=flat-square)](https://flujosn8n.vercel.app)
+<!-- Cuando lo despliegues en Vercel, agrega: [![Live](https://img.shields.io/badge/live-5B9BD5?style=flat-square)](https://TU-DEPLOY.vercel.app) -->
 
 ### 📥 Automatización de cargue en Moodle
 Páginas internas que cargan recursos de forma automática en lugar de manual *(código privado de la institución)*.
@@ -70,13 +70,14 @@ Páginas internas que cargan recursos de forma automática en lugar de manual *(
 ![MySQL](https://img.shields.io/badge/MySQL-2B5F8F?style=flat-square&logo=mysql&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-5B9BD5?style=flat-square&logo=python&logoColor=white)
 
+<!-- Agrega aquí tus próximos proyectos con el mismo formato -->
+
 ---
 
 ## // github stats
 
 <div align="center">
-<img height="165" src="https://github-readme-stats.vercel.app/api?username=JIMENEZ45&show_icons=true&theme=transparent&title_color=5B9BD5&icon_color=5B9BD5&text_color=9aa4af&hide_border=true" alt="GitHub Stats" />
-<img height="165" src="https://streak-stats.demolab.com?user=JIMENEZ45&theme=transparent&ring=5B9BD5&fire=5B9BD5&currStreakLabel=5B9BD5&hide_border=true" alt="Racha" />
+  <img height="165" src="https://streak-stats.demolab.com?user=JIMENEZ45&theme=transparent&ring=5B9BD5&fire=5B9BD5&currStreakLabel=5B9BD5&hide_border=true" alt="Racha" />
 </div>
 
 ---

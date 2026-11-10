@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="24" viewBox="0 0 800 24">
   <defs>
-    <linearGradient id="g" x1="0" x2="1">
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="800" y2="0">
       <stop offset="0" stop-color="#1F3A5F" stop-opacity="0"/>
       <stop offset="0.5" stop-color="#5B9BD5"/>
       <stop offset="1" stop-color="#1F3A5F" stop-opacity="0"/>
     </linearGradient>
   </defs>
   <style>
-    .l{stroke:url(#g);stroke-width:2;animation:p 3s ease-in-out infinite}
-    .d{fill:#5B9BD5;animation:m 4s ease-in-out infinite alternate}
-    @keyframes p{0%,100%{opacity:.4}50%{opacity:1}}
+    .l{animation:p 3s ease-in-out infinite}
+    .d{fill:#A9CCE8;animation:m 4s ease-in-out infinite alternate}
+    @keyframes p{0%,100%{opacity:.5}50%{opacity:1}}
     @keyframes m{from{transform:translateX(-300px)}to{transform:translateX(300px)}}
   </style>
-  <line class="l" x1="0" y1="12" x2="800" y2="12"/>
+  <rect class="l" x="0" y="11" width="800" height="2" fill="url(#g)"/>
   <circle class="d" cx="400" cy="12" r="4"/>
 </svg>

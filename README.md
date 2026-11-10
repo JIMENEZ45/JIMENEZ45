@@ -1,6 +1,6 @@
 <a href="https://raw.githubusercontent.com/JIMENEZ45/JIMENEZ45/main/header.svg">
 <img src="https://raw.githubusercontent.com/JIMENEZ45/JIMENEZ45/main/header.svg" alt="Jeremy Jiménez - Header" width="100%" />
-</a>a>
+</a>
 
 <div align="center">
 
@@ -75,7 +75,7 @@ Páginas internas que cargan recursos de forma automática en lugar de manual *(
 <div align="center">
 <img height="165" src="https://github-readme-stats.vercel.app/api?username=JIMENEZ45&show_icons=true&theme=transparent&title_color=5B9BD5&icon_color=5B9BD5&text_color=9aa4af&hide_border=true" alt="GitHub Stats" />
 <img height="165" src="https://streak-stats.demolab.com?user=JIMENEZ45&theme=transparent&ring=5B9BD5&fire=5B9BD5&currStreakLabel=5B9BD5&hide_border=true" alt="Racha" />
-</div>div>
+</div>
 
 ---
 

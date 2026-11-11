@@ -92,10 +92,19 @@ def main():
         cur = tgt
         todo.discard(tgt)
         foods.append((tgt[0], tgt[1], level(weeks[tgt[0]][tgt[1]], mx), (len(path) - 1) * DT))
+    # al terminar, la serpiente va al hoyo de salida (borde derecho)
+    exit_cell = (W - 1, 3)
+    length = min(len(foods) + 1, MAX_LEN)
+    seg = bfs(cur, exit_cell, set(path[-length:])) or bfs(cur, exit_cell, set()) or []
+    path.extend(seg)
     n = len(path)
-    T = n * DT
+    t_exit = (n - 1) * DT
     L = min(len(foods) + 1, MAX_LEN)
-    D = T + 2 + L * DT + 1.5
+    D = t_exit + L * DT + 3.0
+    T = t_exit
+
+    def pc(t):
+        return t / D * 100
 
     css = []
     # movimiento compartido
@@ -121,15 +130,38 @@ def main():
         css.append(f"@keyframes f{k}{{0%,{p:.3f}%{{opacity:1;transform:scale(1)}}{p + .6:.3f}%{{opacity:0;transform:scale(.2)}}99.5%{{opacity:0}}100%{{opacity:1;transform:scale(1)}}}}")
         rects.append(f'<rect class="f" style="animation:f{k} {D:.2f}s linear infinite" x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="3" fill="{LEVELS[lv]}"/>')
 
+
+    # tuneles: entrada (izquierda, cian) y salida (derecha, rosa)
+    def hole(cell, color, o, c_end, name):
+        x, y = pos(*cell)
+        cx, cy = x + CELL / 2, y + CELL / 2
+        css.append(f"@keyframes {name}{{0%,{pc(o):.3f}%{{opacity:0;transform:scale(0)}}{pc(o + .6):.3f}%{{opacity:1;transform:scale(1)}}"
+                   f"{pc(c_end):.3f}%{{opacity:1;transform:scale(1)}}{pc(c_end + .6):.3f}%{{opacity:0;transform:scale(0)}}100%{{opacity:0}}}}")
+        return (f'<g transform="translate({cx},{cy})"><g class="h" style="animation:{name} {D:.2f}s linear infinite" opacity="0">'
+                f'<ellipse rx="18" ry="13" fill="{color}" fill-opacity=".18"/>'
+                f'<ellipse rx="14" ry="10" fill="#05070d" stroke="{color}" stroke-width="1.5"/>'
+                f'<ellipse class="sp" rx="10" ry="7" fill="none" stroke="{color}" stroke-width="1.2" stroke-dasharray="5 6"/>'
+                f'<ellipse rx="5" ry="3.3" fill="#000"/></g></g>')
+
+    holes = (hole(exit_cell, "#f472b6", max(0, t_exit - 1.2), t_exit + (L - 1) * DT + .6, "ha")
+             + hole((0, 3), "#38bdf8", 0, 2.6, "hb"))
+
     # serpiente (segmento 0 = cabeza)
     segs = []
     for i in range(L - 1, -1, -1):
         t = 1 - i / max(L - 1, 1)
         # cuándo aparece: al comerse el i-ésimo alimento
         appear = 0 if i == 0 else foods[i - 1][3]
-        a = appear / D * 100
-        end = (T + 1) / D * 100
-        css.append(f"@keyframes v{i}{{0%{{opacity:{1 if i == 0 else 0}}}{a:.3f}%{{opacity:{1 if i == 0 else 0}}}{a + .01:.3f}%{{opacity:1}}{end:.3f}%{{opacity:1}}{end + .5:.3f}%{{opacity:0}}100%{{opacity:0}}}}")
+        a = pc(appear)
+        e = pc(t_exit)
+        e2 = pc(t_exit + 0.35)
+        if i == 0:
+            vis = (f"@keyframes v0{{0%{{opacity:0;transform:scale(.2)}}{pc(.7):.3f}%{{opacity:1;transform:scale(1)}}"
+                   f"{e:.3f}%{{opacity:1;transform:scale(1)}}{e2:.3f}%{{opacity:0;transform:scale(.2)}}100%{{opacity:0}}}}")
+        else:
+            vis = (f"@keyframes v{i}{{0%,{a:.3f}%{{opacity:0;transform:scale(.2)}}{a + .01:.3f}%{{opacity:1;transform:scale(1)}}"
+                   f"{e:.3f}%{{opacity:1;transform:scale(1)}}{e2:.3f}%{{opacity:0;transform:scale(.2)}}100%{{opacity:0}}}}")
+        css.append(vis)
         size = CELL if i else CELL + 2
         off = (CELL - size) / 2
         rx = 5 if i == 0 else 4
@@ -138,11 +170,11 @@ def main():
             body += '<circle cx="4" cy="4" r="1.6" fill="#0d1117"/><circle cx="9" cy="4" r="1.6" fill="#0d1117"/>'
         segs.append(
             f'<g style="animation:mv {D:.2f}s linear {i * DT:.2f}s infinite backwards">'
-            f'<g style="animation:v{i} {D:.2f}s linear {i * DT:.2f}s infinite backwards" opacity="0">{body}</g></g>')
+            f'<g class="b" style="animation:v{i} {D:.2f}s linear {i * DT:.2f}s infinite backwards" opacity="0">{body}</g></g>')
 
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">'
-           f'<style>.f{{transform-box:fill-box;transform-origin:center}}{"".join(css)}</style>'
-           + "".join(rects) + "".join(segs) + "</svg>")
+           f'<style>.f,.b,.h{{transform-box:fill-box;transform-origin:center}}.sp{{transform-box:fill-box;transform-origin:center;animation:sp 1.6s linear infinite}}@keyframes sp{{to{{transform:rotate(360deg)}}}}{"".join(css)}</style>'
+           + "".join(rects) + holes + "".join(segs) + "</svg>")
     os.makedirs("dist", exist_ok=True)
     open("dist/snake.svg", "w").write(svg)
     open("dist/snake-dark.svg", "w").write(svg)

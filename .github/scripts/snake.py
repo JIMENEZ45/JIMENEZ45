@@ -1,7 +1,8 @@
 import json, os, sys, random, urllib.request
 
 USER = os.environ.get("GITHUB_USER", "JIMENEZ45")
-CELL, GAP, PAD = 12, 4, 14
+CELL, GAP = 12, 4
+PADX, PADY = 78, 64
 STEP = CELL + GAP
 DT = 0.13          # segundos por casilla
 LEVELS = ["#5eead4", "#38bdf8", "#818cf8", "#c084fc", "#f472b6"]  # nivel 0..4 (0 = vacío)
@@ -46,11 +47,11 @@ def main():
     weeks = fetch_weeks()
     W = len(weeks)
     mx = max(max(c) for c in weeks) or 1
-    width = PAD * 2 + W * STEP - GAP
-    height = PAD * 2 + 7 * STEP - GAP
+    width = PADX * 2 + W * STEP - GAP
+    height = PADY * 2 + 7 * STEP - GAP
 
     def pos(c, r):
-        return PAD + c * STEP, PAD + r * STEP
+        return PADX + c * STEP, PADY + r * STEP
 
     # comida: casillas con contribuciones; la serpiente va a buscarlas
     from collections import deque
@@ -131,20 +132,29 @@ def main():
         rects.append(f'<rect class="f" style="animation:f{k} {D:.2f}s linear infinite" x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="3" fill="{LEVELS[lv]}"/>')
 
 
-    # tuneles: entrada (izquierda, cian) y salida (derecha, rosa)
-    def hole(cell, color, o, c_end, name):
+    # portales grandes: entrada (izquierda, cian) y salida (derecha, rosa)
+    def hole(cell, color, color2, o, c_end, name):
         x, y = pos(*cell)
         cx, cy = x + CELL / 2, y + CELL / 2
-        css.append(f"@keyframes {name}{{0%,{pc(o):.3f}%{{opacity:0;transform:scale(0)}}{pc(o + .6):.3f}%{{opacity:1;transform:scale(1)}}"
-                   f"{pc(c_end):.3f}%{{opacity:1;transform:scale(1)}}{pc(c_end + .6):.3f}%{{opacity:0;transform:scale(0)}}100%{{opacity:0}}}}")
+        css.append(f"@keyframes {name}{{0%,{pc(o):.3f}%{{opacity:0;transform:scale(0)}}{pc(o + .8):.3f}%{{opacity:1;transform:scale(1)}}"
+                   f"{pc(c_end):.3f}%{{opacity:1;transform:scale(1)}}{pc(c_end + .8):.3f}%{{opacity:0;transform:scale(0)}}100%{{opacity:0}}}}")
+        rings = ""
+        for k, (rx, ry, dash, sp) in enumerate([(62, 46, "26 18", 9), (50, 37, "14 16", 6), (38, 28, "30 10", 8), (27, 20, "10 12", 4)]):
+            col = color if k % 2 == 0 else color2
+            rings += (f'<ellipse class="sp" style="animation-duration:{sp}s;animation-direction:{"normal" if k % 2 == 0 else "reverse"}" '
+                      f'rx="{rx}" ry="{ry}" fill="none" stroke="{col}" stroke-width="{3.2 - k * .5:.1f}" stroke-dasharray="{dash}" stroke-linecap="round"/>')
         return (f'<g transform="translate({cx},{cy})"><g class="h" style="animation:{name} {D:.2f}s linear infinite" opacity="0">'
-                f'<ellipse rx="18" ry="13" fill="{color}" fill-opacity=".18"/>'
-                f'<ellipse rx="14" ry="10" fill="#05070d" stroke="{color}" stroke-width="1.5"/>'
-                f'<ellipse class="sp" rx="10" ry="7" fill="none" stroke="{color}" stroke-width="1.2" stroke-dasharray="5 6"/>'
-                f'<ellipse rx="5" ry="3.3" fill="#000"/></g></g>')
+                f'<ellipse rx="78" ry="58" fill="url(#gl{name})"/>{rings}<ellipse rx="19" ry="13" fill="#000"/></g></g>')
 
-    holes = (hole(exit_cell, "#f472b6", max(0, t_exit - 1.2), t_exit + (L - 1) * DT + .6, "ha")
-             + hole((0, 3), "#38bdf8", 0, 2.6, "hb"))
+    defs = "".join(f'<radialGradient id="gl{n}"><stop offset="0" stop-color="#000"/><stop offset=".5" stop-color="#1a0b2e" stop-opacity=".9"/>'
+                   f'<stop offset=".8" stop-color="{c}" stop-opacity=".45"/><stop offset="1" stop-color="{c}" stop-opacity="0"/></radialGradient>'
+                   for n, c in (("ha", "#f472b6"), ("hb", "#38bdf8")))
+    random.seed(11)
+    stars = "".join(f'<circle cx="{random.uniform(0, width):.0f}" cy="{random.uniform(0, height):.0f}" r="{random.choice([.6, .9, 1.2])}" fill="#fff" '
+                    f'style="animation:tw {random.uniform(2, 5):.1f}s ease-in-out {random.uniform(0, 3):.1f}s infinite"/>' for _ in range(90))
+    css.append("@keyframes tw{0%,100%{opacity:.1}50%{opacity:.9}}")
+    holes = (hole(exit_cell, "#f472b6", "#c084fc", max(0, t_exit - 1.4), t_exit + (L - 1) * DT + .8, "ha")
+             + hole((0, 3), "#38bdf8", "#818cf8", 0, 3.0, "hb"))
 
     # serpiente (segmento 0 = cabeza)
     segs = []
@@ -157,10 +167,10 @@ def main():
         e2 = pc(t_exit + 0.35)
         if i == 0:
             vis = (f"@keyframes v0{{0%{{opacity:0;transform:scale(.2)}}{pc(.7):.3f}%{{opacity:1;transform:scale(1)}}"
-                   f"{e:.3f}%{{opacity:1;transform:scale(1)}}{e2:.3f}%{{opacity:0;transform:scale(.2)}}100%{{opacity:0}}}}")
+                   f"{e:.3f}%{{opacity:1;transform:scale(1)}}{e2:.3f}%{{opacity:0;transform:scale(.1) rotate(200deg)}}100%{{opacity:0}}}}")
         else:
             vis = (f"@keyframes v{i}{{0%,{a:.3f}%{{opacity:0;transform:scale(.2)}}{a + .01:.3f}%{{opacity:1;transform:scale(1)}}"
-                   f"{e:.3f}%{{opacity:1;transform:scale(1)}}{e2:.3f}%{{opacity:0;transform:scale(.2)}}100%{{opacity:0}}}}")
+                   f"{e:.3f}%{{opacity:1;transform:scale(1)}}{e2:.3f}%{{opacity:0;transform:scale(.1) rotate(200deg)}}100%{{opacity:0}}}}")
         css.append(vis)
         size = CELL if i else CELL + 2
         off = (CELL - size) / 2
@@ -173,8 +183,9 @@ def main():
             f'<g class="b" style="animation:v{i} {D:.2f}s linear {i * DT:.2f}s infinite backwards" opacity="0">{body}</g></g>')
 
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">'
-           f'<style>.f,.b,.h{{transform-box:fill-box;transform-origin:center}}.sp{{transform-box:fill-box;transform-origin:center;animation:sp 1.6s linear infinite}}@keyframes sp{{to{{transform:rotate(360deg)}}}}{"".join(css)}</style>'
-           + "".join(rects) + holes + "".join(segs) + "</svg>")
+           f'<style>.f,.b,.h{{transform-box:fill-box;transform-origin:center}}.sp{{transform-box:fill-box;transform-origin:center;animation:sp 8s linear infinite}}@keyframes sp{{to{{transform:rotate(360deg)}}}}{"".join(css)}</style>'
+           + f'<defs>{defs}<radialGradient id="bgg" cx=".5" cy=".5" r=".8"><stop offset="0" stop-color="#1b1033"/><stop offset="1" stop-color="#05070d"/></radialGradient></defs>'
+           + f'<rect width="{width}" height="{height}" rx="14" fill="url(#bgg)"/>' + stars + "".join(rects) + holes + "".join(segs) + "</svg>")
     os.makedirs("dist", exist_ok=True)
     open("dist/snake.svg", "w").write(svg)
     open("dist/snake-dark.svg", "w").write(svg)
